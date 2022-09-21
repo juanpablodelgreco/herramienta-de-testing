@@ -2,122 +2,81 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/materia/bootstrap.min.css"
-        integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
-    <style>
-        .vertical-center {
-            min-height: 100%;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-    </style>
-    <title>Herramienta de testing</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/materia/bootstrap.min.css"
+    integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.33/dist/sweetalert2.all.min.js">
+  <style>
+    .vertical-center {
+      min-height: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .text-left,
+    h4 {
+      text-align: left;
+      font-size: medium;
+      font-style: normal !important;
+    }
+  </style>
+  <title>Herramienta de testing</title>
 </head>
 
 <body class="bg-dark">
-    <div class="vertical-center">
-        <div class="container bg-secondary">
-            <div class="row">
-                <div class="col-12 d-flex flex-wrap justify-content-center">
-                    <h3 class="m-3">COPIE Y PEGUE EL MÉTODO</h3>
-                </div>
-                <div class="col-12 d-flex flex-wrap justify-content-center">
-                    <textarea id="codigo" rows="10" cols="100"></textarea>
-                </div>
-                <div class="col-12 d-flex flex-wrap justify-content-center m-2">
-                    <button class="btn btn-success" id="ejecutar" type="button" onclick="mostrarMetricas()">Analizar</button><br>
-                </div>
-            </div>
-            <div class="row p-2 mt-2">
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Cantidad de lineas totales</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Cantidad de Líneas de solo Código</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Cantidad de Líneas comentadas</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Cantidad de Líneas en blanco</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Porcentaje de comentarios</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Complejidad ciclomática</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Fan in</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Fan out</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Halstead - Longitud</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group">
-                            <fieldset disabled>
-                              <label class="form-label" for="disabledInput">Halstead - Volumen</label>
-                              <input class="form-control" id="disabledInput" type="text" disabled>
-                            </fieldset>
-                          </div>
-                    </div>
-                </div>
-            </div>
+  <div class="vertical-center">
+    <div class="container bg-secondary">
+      <div class="row">
+        <div class="col-12 d-flex flex-wrap justify-content-center">
+          <h3 class="m-3">COPIE Y PEGUE EL MÉTODO</h3>
         </div>
+        <div class="col-12 d-flex flex-wrap justify-content-center">
+          <textarea id="input-code" rows="10" cols="100"></textarea>
+        </div>
+        <div class="col-12 d-flex flex-wrap justify-content-center m-2">
+          <button class="btn btn-success" id="ejecutar" type="button" onclick="showMetrics()">Analizar</button><br>
+        </div>
+      </div>
     </div>
-    </div>
+  </div>
+  </div>
+  </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </html>
+<script>
+  function showMetrics() {
+    var inputCode = document.getElementById("input-code").value;
+    const regex = /^\s*?(((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient)\s+?)*)\s*?(\w+?)\s+?(\w+?)\s*?\(([^)]*)\)[\w\s,]*?(\{)?\s*?$/gm;
+      if (!inputCode.match(regex)) {
+        Swal.fire({
+          title: 'Ingrese un codigo por favor.',
+          text: "Debe ingresar una función correspondiente a la sintaxis de java a analizar.",
+          icon: 'warning',
+        }
+        );
+        return;
+      }
+
+      inputCode = inputCode.toLowerCase();
+      var totalLines = inputCode.split('\n').length;
+      var commentLines = inputCode.split('//').length - 1;
+      var codeLines = parseInt(totalLines - commentLines - 2);
+      var percentageOfCommentedLines = (parseFloat((parseInt(commentLines) / parseInt(totalLines)) * 100).toFixed(2)) + "%";
+      if (!isNaN(percentageOfCommentedLines)) percentageOfCommentedLines = 0 + "%";
+
+      Swal.fire({
+        title: 'Resultado',
+        html: `
+      <h4>Lineas totales: ${totalLines}</h4>
+      <h4>Lineas de código: ${codeLines}</h4>
+      <h4>Lineas comentadas: ${commentLines}</h4>
+      <h4>Porcentaje lineas comentadas: ${percentageOfCommentedLines}</h4>
+      `,
+      });
+    }
+</script>
