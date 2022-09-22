@@ -50,33 +50,72 @@
 </html>
 <script>
   function showMetrics() {
-    var inputCode = document.getElementById("input-code").value;
+    const inputCode = document.getElementById("input-code").value.toLowerCase();
     const regex = /^\s*?(((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient)\s+?)*)\s*?(\w+?)\s+?(\w+?)\s*?\(([^)]*)\)[\w\s,]*?(\{)?\s*?$/gm;
-      if (!inputCode.match(regex)) {
-        Swal.fire({
-          title: 'Ingrese un codigo por favor.',
-          text: "Debe ingresar una función correspondiente a la sintaxis de java a analizar.",
-          icon: 'warning',
-        }
-        );
-        return;
-      }
-
-      inputCode = inputCode.toLowerCase();
-      var totalLines = inputCode.split('\n').length;
-      var commentLines = inputCode.split('//').length - 1;
-      var codeLines = parseInt(totalLines - commentLines - 2);
-      var percentageOfCommentedLines = (parseFloat((parseInt(commentLines) / parseInt(totalLines)) * 100).toFixed(2)) + "%";
-      if (!isNaN(percentageOfCommentedLines)) percentageOfCommentedLines = 0 + "%";
-
+    if (!inputCode.match(regex)) {
       Swal.fire({
-        title: 'Resultado',
-        html: `
+        title: 'Ingrese un codigo por favor.',
+        text: "Debe ingresar una función correspondiente a la sintaxis de java a analizar.",
+        icon: 'warning',
+      }
+      );
+      return;
+    }
+
+    const { complex, blanks, comments, totalLines
+    } = analizeCode(inputCode);
+    const codeLines = parseInt(totalLines - comments - blanks);
+    const percentOfComments = (parseFloat((parseInt(comments) / parseInt(totalLines)) * 100).toFixed(2)) + "%";
+    if (!isNaN(percentOfComments)) percentOfComments = 0 + "%";
+
+    Swal.fire({
+      title: 'Reporte',
+      html: generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments),
+    });
+  }
+
+  function analizeCode(inputCode) {
+    let complex = 0;
+    let blanks = 0;
+    let comments = 0;
+    const text = inputCode.split('\n');
+    for (let i = 0; i < text.length; i++) {
+      let hasIf = text[i].split('if').length > 1 ? true : false;
+      let hasWhile = text[i].split('while').length > 1 ? true : false;
+      let ors = text[i].split('||').length;
+      let ands = text[i].split('&&').length;
+
+      if (text[i].split('//').length > 1) { comments++; continue; }
+      if (text[i] === '') { blanks++; continue; }
+      if (ors > 1) complex += ors + 1;
+      if (ands > 1) complex += ands + 1;
+      if (hasIf && ors <= 1 && ands <= 1) complex += 1;
+      if (hasWhile && ors <= 1 && ands <= 1) complex += 1;
+    }
+
+    complex++;
+    return { complex, blanks, comments, totalLines: text.length };
+  }
+
+  function generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments) {
+    let html =
+      `
       <h4>Lineas totales: ${totalLines}</h4>
       <h4>Lineas de código: ${codeLines}</h4>
-      <h4>Lineas comentadas: ${commentLines}</h4>
-      <h4>Porcentaje lineas comentadas: ${percentageOfCommentedLines}</h4>
-      `,
-      });
+      <h4>Lineas comentadas: ${comments}</h4>
+      <h4>Lineas en blanco: ${blanks}</h4>
+      <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
+      <h4>Complejidad ciclomática: ${complex}</h4>
+      `;
+
+    if (parseInt(percentOfComments.split('%')[0]) < 10) {
+      html += `<h4 class="text-warning">El porcentaje de comentarios debería ser mayor a 10%.</h4>`;
     }
+
+    if (complex > 10) {
+      html += `<h4 class="text-warning">La complejidad ciclomática no debería ser mayor a 10.</h4>`;
+    }
+
+    return html;
+  }
 </script>
