@@ -9,6 +9,16 @@
     integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.33/dist/sweetalert2.all.min.js">
   <style>
+    body {
+      background: rgb(2, 0, 36);
+      background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(140, 215, 165, 1) 35%, rgba(0, 212, 255, 1) 100%);
+    }
+
+    .container {
+      max-width: 50%;
+      padding: 10px;
+    }
+
     .vertical-center {
       min-height: 100%;
       min-height: 100vh;
@@ -22,16 +32,24 @@
       font-size: medium;
       font-style: normal !important;
     }
+
+    .border-gradient {
+      border: 10px solid;
+      border-image-slice: 1;
+      border-width: 5px;
+      border-radius: 50px 50px 50px 50px / 25px 25px 25px 25px;
+      ;
+    }
   </style>
   <title>Herramienta de testing</title>
 </head>
 
-<body class="bg-dark">
+<body>
   <div class="vertical-center">
-    <div class="container bg-secondary">
+    <div class="container bg-secondary border-gradient">
       <div class="row">
         <div class="col-12 d-flex flex-wrap justify-content-center">
-          <h3 class="m-3">COPIE Y PEGUE EL MÉTODO</h3>
+          <h3 class="m-3">PEGUE EL MÉTODO A ANALIZAR</h3>
         </div>
         <div class="col-12 d-flex flex-wrap justify-content-center">
           <textarea id="input-code" rows="10" cols="100"></textarea>
@@ -68,9 +86,14 @@
     const percentOfComments = (parseFloat((parseInt(comments) / parseInt(totalLines)) * 100).toFixed(2)) + "%";
     if (!isNaN(percentOfComments)) percentOfComments = 0 + "%";
 
+    const { cantUniqueOperators, cantTotalOperators } = getOperators(inputCode);
+    const { cantUniqueOperands, cantTotalOperands } = getOperands(inputCode);
+    const halsteadLength = getHalsteadLength(cantUniqueOperators, cantUniqueOperands);
+    const halsteadVolume = getHalsteadVolume(cantUniqueOperators, cantUniqueOperands, cantTotalOperators, cantTotalOperands);
+
     Swal.fire({
       title: 'Reporte',
-      html: generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments),
+      html: generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume),
     });
   }
 
@@ -80,24 +103,73 @@
     let comments = 0;
     const text = inputCode.split('\n');
     for (let i = 0; i < text.length; i++) {
-      let hasIf = text[i].split('if').length > 1 ? true : false;
-      let hasWhile = text[i].split('while').length > 1 ? true : false;
-      let ors = text[i].split('||').length;
-      let ands = text[i].split('&&').length;
+      let hasIf = text[i].split('if(').length - 1 > 0 ? true : false;
+      let hasWhile = text[i].split('while(').length - 1 > 0 ? true : false;
+      let hasFor = text[i].split('for(').length - 1 > 0 ? true : false;
+      let hasCase = text[i].split('case').length - 1 > 0 ? true : false;
+      let ors = text[i].split('||').length - 1;
+      let ands = text[i].split('&&').length - 1;
 
       if (text[i].split('//').length > 1) { comments++; continue; }
       if (text[i] === '') { blanks++; continue; }
-      if (ors > 1) complex += ors + 1;
-      if (ands > 1) complex += ands + 1;
-      if (hasIf && ors <= 1 && ands <= 1) complex += 1;
-      if (hasWhile && ors <= 1 && ands <= 1) complex += 1;
+      if (ors > 0) complex += ors + 1;
+      if (ands > 0) complex += ands + 1;
+      if (hasIf && ors == 0 && ands == 0) complex += 1;
+      if (hasWhile && ors == 0 && ands == 0) complex += 1;
+      if (hasFor && ors == 0 && ands == 0) complex += 1;
+      if (hasCase && ors == 0 && ands == 0) complex += 1;
     }
 
     complex++;
     return { complex, blanks, comments, totalLines: text.length };
   }
 
-  function generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments) {
+  function getOperators(inputCode) {
+    const operators = ["public", "static", "void", "&&", "||", "<=", ">=", "<", ">", "!=", "!", "+", "-", "/", "*", "int", "double", "float", ";", ":"];
+    const text = inputCode.split(' ');
+    let cantUniqueOperators = 0;
+    let cantTotalOperators = 0;
+    for (let i = 0; i < text.length; i++) {
+      if (text[i].split('//').length > 1) { comments++; continue; }
+
+      if (text.indexOf(operators[i]) != -1)
+        cantUniqueOperators++;
+
+      cantTotalOperators += inputCode.split(operators[i]).length - 1;
+    }
+
+    return { cantUniqueOperators, cantTotalOperators };
+  }
+
+  function getOperands(inputCode) {
+    const operators = ["public", "static", "void", "&&", "||", "<=", ">=", "<", ">", "!=", "!", "+", "-", "/", "*", "int", "double", "float", ";", ":"];
+    const text = inputCode.split(' ');
+    const uniqueOperands = [];
+    let cantUniqueOperands = 0;
+    let cantTotalOperands = 0;
+    for (let i = 0; i < text.length; i++) {
+
+      if (operators.indexOf(text[i]) == -1 && uniqueOperands.indexOf(text[i]) == -1) {
+        uniqueOperands.push(text[i]);
+        cantUniqueOperands++;
+      }
+
+      if (operators.indexOf(text[i]) == -1)
+        cantTotalOperands++;
+    }
+
+    return { cantUniqueOperands, cantTotalOperands };
+  }
+
+  function getHalsteadLength(cantUniqueOperators, cantUniqueOperands) {
+    return parseInt(cantUniqueOperators * Math.log2(cantUniqueOperators) + cantUniqueOperands * Math.log2(cantUniqueOperands));
+  }
+
+  function getHalsteadVolume(uniqueOperands, cantUniqueOperands, cantTotalOperators, cantTotalOperands) {
+    return parseFloat((cantTotalOperators + cantTotalOperands) * Math.log2(uniqueOperands + cantUniqueOperands)).toFixed(2);
+  }
+
+  function generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume) {
     let html =
       `
       <h4>Lineas totales: ${totalLines}</h4>
@@ -106,6 +178,8 @@
       <h4>Lineas en blanco: ${blanks}</h4>
       <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
       <h4>Complejidad ciclomática: ${complex}</h4>
+      <h4>Halstead - Longitud: ${halsteadLength}</h4>
+      <h4>Halstead - Volumen: ${halsteadVolume}</h4>
       `;
 
     if (parseInt(percentOfComments.split('%')[0]) < 10) {
