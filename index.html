@@ -103,9 +103,9 @@
     let comments = 0;
     const text = inputCode.split('\n');
     for (let i = 0; i < text.length; i++) {
-      let hasIf = text[i].split('if(').length - 1 > 0 ? true : false;
-      let hasWhile = text[i].split('while(').length - 1 > 0 ? true : false;
-      let hasFor = text[i].split('for(').length - 1 > 0 ? true : false;
+      let hasIf = text[i].split('if').length - 1 > 0 ? true : false;
+      let hasWhile = text[i].split('while').length - 1 > 0 ? true : false;
+      let hasFor = text[i].split('for').length - 1 > 0 ? true : false;
       let hasCase = text[i].split('case').length - 1 > 0 ? true : false;
       let ors = text[i].split('||').length - 1;
       let ands = text[i].split('&&').length - 1;
@@ -165,7 +165,6 @@
     return parseInt(cantUniqueOperators * Math.log2(cantUniqueOperators) + cantUniqueOperands * Math.log2(cantUniqueOperands));
   }
 
-  function getHalsteadVolume(uniqueOperands, cantUniqueOperands, cantTotalOperators, cantTotalOperands) {
     return parseFloat((cantTotalOperators + cantTotalOperands) * Math.log2(uniqueOperands + cantUniqueOperands)).toFixed(2);
   }
 
