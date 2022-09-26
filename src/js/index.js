@@ -1,7 +1,9 @@
+const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?\s+?\w+?\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
+
 function showMetrics() {
   const inputCode = document.getElementById("input-code").value.toLowerCase();
-  const regex = /^\s*?(((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient)\s+?)*)\s*?(\w+?)\s+?(\w+?)\s*?\(([^)]*)\)[\w\s,]*?(\{)?\s*?$/gm;
-  if (!inputCode.match(regex)) {
+  
+  if (!inputCode.match(JAVA_METHOD_SIGN_REGEX)) {
     Swal.fire({
       title: 'Ingrese un codigo por favor.',
       text: "Debe ingresar una función correspondiente a la sintaxis de java a analizar.",
@@ -11,7 +13,19 @@ function showMetrics() {
     return;
   }
 
-  const { complex, blanks, comments, totalLines } = analizeCode(inputCode);
+  setInfoHTML("")
+  functionExtractor(inputCode)
+}
+
+function setInfoHTML(infoHTML) {
+  document.getElementById("result_container").innerHTML = infoHTML
+}
+
+function appendInfoHTML(infoHTML) {
+  document.getElementById("result_container").innerHTML += infoHTML
+}
+
+function getInfo({ fnSign, inputCode, complex, blanks, comments, totalLines }) {
   const codeLines = parseInt(totalLines - comments - blanks);
   const percentOfComments = (parseFloat((parseInt(comments) / parseInt(totalLines)) * 100).toFixed(2)) + "%";
   if (!isNaN(percentOfComments)) percentOfComments = 0 + "%";
@@ -21,7 +35,17 @@ function showMetrics() {
   const halsteadLength = getHalsteadLength(cantUniqueOperators, cantUniqueOperands);
   const halsteadVolume = getHalsteadVolume(cantUniqueOperators, cantUniqueOperands, cantTotalOperators, cantTotalOperands);
 
-  document.getElementById("result_container").innerHTML = generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume)
+  return {
+    totalLines,
+    codeLines,
+    complex,
+    blanks,
+    comments,
+    percentOfComments,
+    halsteadLength,
+    halsteadVolume,
+    fnSign
+  }
 }
 
 function analizeCode(inputCode) {
@@ -103,10 +127,11 @@ function getHalsteadVolume(uniqueOperands, cantUniqueOperands, cantTotalOperator
   return parseFloat((cantTotalOperators + cantTotalOperands) * Math.log2(uniqueOperands + cantUniqueOperands)).toFixed(2);
 }
 
-function generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume) {
+function generateHtml({fnSign, totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume}) {
   let html =
     `
     <div class="result">
+      <h4><strong>${fnSign}</strong></h4>
       <h4>Lineas totales: ${totalLines}</h4>
       <h4>Lineas de código: ${codeLines}</h4>
       <h4>Lineas comentadas: ${comments}</h4>
@@ -128,4 +153,40 @@ function generateHtml(totalLines, codeLines, complex, blanks, comments, percentO
   html += `</div>`
 
   return html;
+}
+
+function functionExtractor(code) {
+  posibleFnMatchArray = [...code.matchAll(JAVA_METHOD_SIGN_REGEX)]
+
+  posibleFnMatchArray.filter(skipNoFunction).forEach(([fnSignWithOpenToken, fnSign]) => {
+    const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
+    const analisis = analizeCode(fnBody);
+    const info = getInfo({fnSign, inputCode: fnBody, ...analisis})
+    const infoHTML = generateHtml(info)
+    appendInfoHTML(infoHTML)
+  })
+}
+
+function skipNoFunction([fnSignWithOpenToken]) {
+  return !fnSignWithOpenToken.includes('if(') 
+  && !fnSignWithOpenToken.includes('if (')
+  && !fnSignWithOpenToken.includes('while(')
+  && !fnSignWithOpenToken.includes('while (')
+  && !fnSignWithOpenToken.includes('for(')
+  && !fnSignWithOpenToken.includes('for (')
+  && !fnSignWithOpenToken.includes("switch(")
+  && !fnSignWithOpenToken.includes("switch (")
+}
+
+function cropFunctionBody(code, fnSignWithOpenToken) {
+  const codeFromFnDeclaration = code.split(fnSignWithOpenToken)[1].trim()
+    let openTokenIdx = 0
+    let closeTokenIdx = 0
+
+    while(openTokenIdx != -1 && closeTokenIdx != -1 && closeTokenIdx >= openTokenIdx) {
+      openTokenIdx = codeFromFnDeclaration.indexOf("{", openTokenIdx+1)
+      closeTokenIdx = codeFromFnDeclaration.indexOf("}", closeTokenIdx+1)
+    }
+
+    return codeFromFnDeclaration.slice(0, closeTokenIdx)
 }
