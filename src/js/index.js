@@ -1,4 +1,5 @@
 const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?\s+?\w+?\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
+const PREDICATOR_REGEX = /(while|if|switch)\s*\(.*\)/gm
 
 function showMetrics() {
   const inputCode = document.getElementById("input-code").value.toLowerCase();
@@ -78,7 +79,22 @@ function analizeCode(inputCode) {
   }
 
   complex++;
-  return { complex, blanks, comments, totalLines: text.length };
+
+  const newComplex = calculateComplexity(inputCode)
+
+  return { complex: newComplex, blanks, comments, totalLines: text.length };
+}
+
+function calculateComplexity(inputCode) {
+  const conditionsArray = [...inputCode.matchAll(PREDICATOR_REGEX)]
+  let predicatorCount = 0
+
+  conditionsArray.forEach(([condition]) => {
+    predicatorCount+= condition.split("&&").length-1
+    predicatorCount+= condition.split("||").length-1
+  })
+
+  return predicatorCount+1 || 1
 }
 
 function getOperators(inputCode) {
