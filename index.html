@@ -13,22 +13,33 @@
 </head>
 
 <body>
-  <div class="vertical-center">
-    <div class="container bg-secondary border-gradient">
-      <div class="row">
-        <div class="col-12 d-flex flex-wrap justify-content-center">
-          <h3 class="m-3">PEGUE EL MÉTODO A ANALIZAR</h3>
-        </div>
-        <div class="col-12 d-flex flex-wrap justify-content-center">
-          <textarea id="input-code" rows="10" cols="100"></textarea>
-        </div>
-        <div class="col-12 d-flex flex-wrap justify-content-center m-2">
-          <button class="btn btn-success" id="ejecutar" type="button" onclick="showMetrics()">Analizar</button><br>
-        </div>
+  <div class="container bg-secondary border-gradient">
+    <div class="row">
+      <div class="col-12 d-flex flex-wrap justify-content-center">
+        <h3 class="m-3">PEGUE EL MÉTODO A ANALIZAR</h3>
+      </div>
+      <div class="col-12 d-flex flex-wrap justify-content-center">
+        <textarea id="input-code" rows="10" cols="100"></textarea>
+      </div>
+      <div class="col-12 d-flex flex-wrap justify-content-center m-2">
+        <button class="btn btn-success" id="ejecutar" type="button" onclick="showMetrics()">Analizar</button><br>
       </div>
     </div>
   </div>
-  </div>
+  <div class="container bg-secondary border-gradient">
+    <h1>Resultado:</h1>
+    <div id="result_container" class="row px-5 py-3">      
+      <div class="result">
+        <h4>Lineas totales: <span id="totalLines">-</span></h4>
+        <h4>Lineas de código: <span id="codeLines">-</span></h4>
+        <h4>Lineas comentadas: <span id="comments">-</span></h4>
+        <h4>Lineas en blanco: <span id="blanks">-</span></h4>
+        <h4>Porcentaje lineas comentadas: <span id="percentOfComments">-</span></h4>
+        <h4>Complejidad ciclomática: <span id="complex">-</span></h4>
+        <h4>Halstead - Longitud: <span id="halsteadLength">-</span></h4>
+        <h4>Halstead - Volumen: <span id="halsteadVolume">-</span></h4>
+      </div>
+    </div>
   </div>
   <script src="src/js/index.js"></script>
 </body>

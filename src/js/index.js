@@ -21,10 +21,7 @@ function showMetrics() {
   const halsteadLength = getHalsteadLength(cantUniqueOperators, cantUniqueOperands);
   const halsteadVolume = getHalsteadVolume(cantUniqueOperators, cantUniqueOperands, cantTotalOperators, cantTotalOperands);
 
-  Swal.fire({
-    title: 'Reporte',
-    html: generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume),
-  });
+  document.getElementById("result_container").innerHTML = generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume)
 }
 
 function analizeCode(inputCode) {
@@ -109,14 +106,15 @@ function getHalsteadVolume(uniqueOperands, cantUniqueOperands, cantTotalOperator
 function generateHtml(totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume) {
   let html =
     `
-    <h4>Lineas totales: ${totalLines}</h4>
-    <h4>Lineas de código: ${codeLines}</h4>
-    <h4>Lineas comentadas: ${comments}</h4>
-    <h4>Lineas en blanco: ${blanks}</h4>
-    <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
-    <h4>Complejidad ciclomática: ${complex}</h4>
-    <h4>Halstead - Longitud: ${halsteadLength}</h4>
-    <h4>Halstead - Volumen: ${halsteadVolume}</h4>
+    <div class="result">
+      <h4>Lineas totales: ${totalLines}</h4>
+      <h4>Lineas de código: ${codeLines}</h4>
+      <h4>Lineas comentadas: ${comments}</h4>
+      <h4>Lineas en blanco: ${blanks}</h4>
+      <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
+      <h4>Complejidad ciclomática: ${complex}</h4>
+      <h4>Halstead - Longitud: ${halsteadLength}</h4>
+      <h4>Halstead - Volumen: ${halsteadVolume}</h4>
     `;
 
   if (parseInt(percentOfComments.split('%')[0]) < 10) {
@@ -126,6 +124,8 @@ function generateHtml(totalLines, codeLines, complex, blanks, comments, percentO
   if (complex > 10) {
     html += `<h4 class="text-warning">La complejidad ciclomática no debería ser mayor a 10.</h4>`;
   }
+
+  html += `</div>`
 
   return html;
 }
