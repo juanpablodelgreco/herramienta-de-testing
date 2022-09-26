@@ -1,5 +1,5 @@
 const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?\s+?\w+?\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
-const PREDICATOR_REGEX = /(while|if|switch)\s*\(.*\)/gm
+const PREDICATOR_REGEX = /((while|if)\s*\(.*\)|case *\w:)/gm
 
 function showMetrics() {
   const inputCode = document.getElementById("input-code").value.toLowerCase();
@@ -90,8 +90,12 @@ function calculateComplexity(inputCode) {
   let predicatorCount = 0
 
   conditionsArray.forEach(([condition]) => {
-    predicatorCount+= condition.split("&&").length-1
-    predicatorCount+= condition.split("||").length-1
+    if(condition.includes("case")) {
+      predicatorCount++
+    } else {
+      predicatorCount+= condition.split("&&").length-1
+      predicatorCount+= condition.split("||").length-1    
+    }
   })
 
   return predicatorCount+1 || 1
