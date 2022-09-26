@@ -1,8 +1,11 @@
-const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?\s+?\w+?\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
+const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?\s+?(\w+?)\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
 const PREDICATOR_REGEX = /((while|if)\s*\(.*\)|case *\w:)/gm
+const PARTIAL_FUNCTION_CALL_REGEX = /\s*\(/gm
+
+let inputCode
 
 function showMetrics() {
-  const inputCode = document.getElementById("input-code").value.toLowerCase();
+  inputCode = document.getElementById("input-code").value.toLowerCase();
   
   if (!inputCode.match(JAVA_METHOD_SIGN_REGEX)) {
     Swal.fire({
@@ -15,7 +18,7 @@ function showMetrics() {
   }
 
   setInfoHTML("")
-  functionExtractor(inputCode)
+  functionAnalizer(inputCode)
 }
 
 function setInfoHTML(infoHTML) {
@@ -26,15 +29,16 @@ function appendInfoHTML(infoHTML) {
   document.getElementById("result_container").innerHTML += infoHTML
 }
 
-function getInfo({ fnSign, inputCode, complex, blanks, comments, totalLines }) {
+function getInfo({ fnSign, fnName, functionCode, complex, blanks, comments, totalLines }) {
   const codeLines = parseInt(totalLines - comments - blanks);
   const percentOfComments = (parseFloat((parseInt(comments) / parseInt(totalLines)) * 100).toFixed(2)) + "%";
   if (!isNaN(percentOfComments)) percentOfComments = 0 + "%";
 
-  const { cantUniqueOperators, cantTotalOperators } = getOperators(inputCode);
-  const { cantUniqueOperands, cantTotalOperands } = getOperands(inputCode);
+  const { cantUniqueOperators, cantTotalOperators } = getOperators(functionCode);
+  const { cantUniqueOperands, cantTotalOperands } = getOperands(functionCode);
   const halsteadLength = getHalsteadLength(cantUniqueOperators, cantUniqueOperands);
   const halsteadVolume = getHalsteadVolume(cantUniqueOperators, cantUniqueOperands, cantTotalOperators, cantTotalOperands);
+  const fanIn = getFanIn(fnName)
 
   return {
     totalLines,
@@ -45,15 +49,16 @@ function getInfo({ fnSign, inputCode, complex, blanks, comments, totalLines }) {
     percentOfComments,
     halsteadLength,
     halsteadVolume,
-    fnSign
+    fnSign,
+    fanIn
   }
 }
 
-function analizeCode(inputCode) {
+function analizeCode(functionCode) {
   let complex = 0;
   let blanks = 0;
   let comments = 0;
-  const text = inputCode.split('\n');
+  const text = functionCode.split('\n');
   for (let i = 0; i < text.length; i++) {
     let hasIf = text[i].split('if(').length - 1 > 0 ? true : false;
     let hasIf2 = text[i].split('if (').length - 1 > 0 ? true : false;
@@ -80,13 +85,13 @@ function analizeCode(inputCode) {
 
   complex++;
 
-  const newComplex = calculateComplexity(inputCode)
+  const newComplex = calculateComplexity(functionCode)
 
   return { complex: newComplex, blanks, comments, totalLines: text.length };
 }
 
-function calculateComplexity(inputCode) {
-  const conditionsArray = [...inputCode.matchAll(PREDICATOR_REGEX)]
+function calculateComplexity(functionCode) {
+  const conditionsArray = [...functionCode.matchAll(PREDICATOR_REGEX)]
   let predicatorCount = 0
 
   conditionsArray.forEach(([condition]) => {
@@ -101,9 +106,9 @@ function calculateComplexity(inputCode) {
   return predicatorCount+1 || 1
 }
 
-function getOperators(inputCode) {
+function getOperators(functionCode) {
   const operators = ["public", "static", "void", "&&", "||", "<=", ">=", "<", ">", "!=", "!", "+", "-", "/", "*", "int", "double", "float", ";", ":"];
-  const text = inputCode.split(' ');
+  const text = functionCode.split(' ');
   let cantUniqueOperators = 0;
   let cantTotalOperators = 0;
   for (let i = 0; i < text.length; i++) {
@@ -112,15 +117,15 @@ function getOperators(inputCode) {
     if (text.indexOf(operators[i]) != -1)
       cantUniqueOperators++;
 
-    cantTotalOperators += inputCode.split(operators[i]).length - 1;
+    cantTotalOperators += functionCode.split(operators[i]).length - 1;
   }
 
   return { cantUniqueOperators, cantTotalOperators };
 }
 
-function getOperands(inputCode) {
+function getOperands(functionCode) {
   const operators = ["public", "static", "void", "&&", "||", "<=", ">=", "<", ">", "!=", "!", "+", "-", "/", "*", "int", "double", "float", ";", ":"];
-  const text = inputCode.split(' ');
+  const text = functionCode.split(' ');
   const uniqueOperands = [];
   let cantUniqueOperands = 0;
   let cantTotalOperands = 0;
@@ -147,7 +152,13 @@ function getHalsteadVolume(uniqueOperands, cantUniqueOperands, cantTotalOperator
   return parseFloat((cantTotalOperators + cantTotalOperands) * Math.log2(uniqueOperands + cantUniqueOperands)).toFixed(2);
 }
 
-function generateHtml({fnSign, totalLines, codeLines, complex, blanks, comments, percentOfComments, halsteadLength, halsteadVolume}) {
+function getFanIn(fnName) {
+  const fnNameOcurrences = [...inputCode.matchAll(fnName+PARTIAL_FUNCTION_CALL_REGEX.source)]
+
+  return fnNameOcurrences.length-1
+}
+
+function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, blanks, comments, percentOfComments, halsteadLength, halsteadVolume}) {
   let html =
     `
     <div class="result">
@@ -158,6 +169,7 @@ function generateHtml({fnSign, totalLines, codeLines, complex, blanks, comments,
       <h4>Lineas en blanco: ${blanks}</h4>
       <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
       <h4>Complejidad ciclomática: ${complex}</h4>
+      <h4>Fan in: ${fanIn}</h4>
       <h4>Halstead - Longitud: ${halsteadLength}</h4>
       <h4>Halstead - Volumen: ${halsteadVolume}</h4>
     `;
@@ -175,13 +187,13 @@ function generateHtml({fnSign, totalLines, codeLines, complex, blanks, comments,
   return html;
 }
 
-function functionExtractor(code) {
+function functionAnalizer(code) {
   posibleFnMatchArray = [...code.matchAll(JAVA_METHOD_SIGN_REGEX)]
 
-  posibleFnMatchArray.filter(skipNoFunction).forEach(([fnSignWithOpenToken, fnSign]) => {
+  posibleFnMatchArray.filter(skipNoFunction).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
     const analisis = analizeCode(fnBody);
-    const info = getInfo({fnSign, inputCode: fnBody, ...analisis})
+    const info = getInfo({fnSign, fnName, functionCode: fnBody, ...analisis})
     const infoHTML = generateHtml(info)
     appendInfoHTML(infoHTML)
   })
