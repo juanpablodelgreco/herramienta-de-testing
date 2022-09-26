@@ -99,11 +99,13 @@ function calculateComplexity(functionCode) {
   let predicatorCount = 0
 
   conditionsArray.forEach(([condition]) => {
-    if(condition.includes("case")) {
+    if(!condition.includes("&&") && !condition.includes("||"))
       predicatorCount++
-    } else {
-      predicatorCount+= condition.split("&&").length-1
-      predicatorCount+= condition.split("||").length-1    
+    else {
+      if(condition.includes("||"))
+        predicatorCount += condition.split("||").length
+      if(condition.includes("&&"))
+        predicatorCount += condition.split("&&").length
     }
   })
 
@@ -206,7 +208,7 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
 function functionAnalizer(code) {
   posibleFnMatchArray = [...code.matchAll(JAVA_METHOD_SIGN_REGEX)]
 
-  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {
+  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {    
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
     const analisis = analizeCode(fnBody);
     const info = getInfo({fnSign, fnName, functionCode: fnBody, ...analisis})
