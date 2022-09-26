@@ -3,9 +3,11 @@ const PREDICATOR_REGEX = /((while|if)\s*\(.*\)|case *\w:)/gm
 const PARTIAL_FUNCTION_CALL_REGEX = /\s*\(/gm
 
 let inputCode
+let functionsListRegex
 
 function showMetrics() {
   inputCode = document.getElementById("input-code").value.toLowerCase();
+  functionsListRegex = []
   
   if (!inputCode.match(JAVA_METHOD_SIGN_REGEX)) {
     Swal.fire({
@@ -39,6 +41,7 @@ function getInfo({ fnSign, fnName, functionCode, complex, blanks, comments, tota
   const halsteadLength = getHalsteadLength(cantUniqueOperators, cantUniqueOperands);
   const halsteadVolume = getHalsteadVolume(cantUniqueOperators, cantUniqueOperands, cantTotalOperators, cantTotalOperands);
   const fanIn = getFanIn(fnName)
+  const fanOut = getFanOut(functionCode)
 
   return {
     totalLines,
@@ -50,7 +53,8 @@ function getInfo({ fnSign, fnName, functionCode, complex, blanks, comments, tota
     halsteadLength,
     halsteadVolume,
     fnSign,
-    fanIn
+    fanIn,
+    fanOut
   }
 }
 
@@ -158,7 +162,18 @@ function getFanIn(fnName) {
   return fnNameOcurrences.length-1
 }
 
-function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, blanks, comments, percentOfComments, halsteadLength, halsteadVolume}) {
+function getFanOut(fnBody) {
+  let fanOut = 0
+
+  functionsListRegex.forEach((fnRegex) => {
+    const ocurrences = [...fnBody.matchAll(fnRegex)]
+    fanOut += ocurrences.length
+  })
+
+  return fanOut
+}
+
+function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, blanks, comments, percentOfComments, halsteadLength, halsteadVolume}) {
   let html =
     `
     <div class="result">
@@ -170,6 +185,7 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, blanks, co
       <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
       <h4>Complejidad ciclomática: ${complex}</h4>
       <h4>Fan in: ${fanIn}</h4>
+      <h4>Fan out: ${fanOut}</h4>
       <h4>Halstead - Longitud: ${halsteadLength}</h4>
       <h4>Halstead - Volumen: ${halsteadVolume}</h4>
     `;
@@ -190,13 +206,21 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, blanks, co
 function functionAnalizer(code) {
   posibleFnMatchArray = [...code.matchAll(JAVA_METHOD_SIGN_REGEX)]
 
-  posibleFnMatchArray.filter(skipNoFunction).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {
+  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
     const analisis = analizeCode(fnBody);
     const info = getInfo({fnSign, fnName, functionCode: fnBody, ...analisis})
     const infoHTML = generateHtml(info)
     appendInfoHTML(infoHTML)
   })
+}
+
+function loadFunctionListRegex(fnMatch) {
+  const fnName = fnMatch[3]
+
+  functionsListRegex.push(new RegExp(fnName+PARTIAL_FUNCTION_CALL_REGEX.source, "gm"))
+
+  return fnMatch
 }
 
 function skipNoFunction([fnSignWithOpenToken]) {
