@@ -211,6 +211,7 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
 
 function functionAnalizer(code) {
   posibleFnMatchArray = [...code.matchAll(JAVA_METHOD_SIGN_REGEX)]
+  addResultsTitle()
 
   posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {    
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
@@ -219,6 +220,10 @@ function functionAnalizer(code) {
     const infoHTML = generateHtml(info)
     appendInfoHTML(infoHTML)
   })
+}
+
+function addResultsTitle() {
+  setInfoHTML("<h1>Resultados</h1>")
 }
 
 function loadFunctionListRegex(fnMatch) {
