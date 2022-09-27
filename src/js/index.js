@@ -1,4 +1,4 @@
-const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?\s+?(\w+?)\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
+const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|synchronized|abstract|threadsafe|transient|\s)+\s*?\w+?(<\s*\w+\s*>)?\s+?(\w+?)\s*?\([^)]*\)[\w\s,]*?)\{?\s*?$/gm;
 const PREDICATOR_REGEX = /((while|if)\s*\(.*\)|case *\w:)/gm
 const PARTIAL_FUNCTION_CALL_REGEX = /\s*\(/gm
 
@@ -183,7 +183,7 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
   let html =
     `
     <div class="result">
-      <h4><strong>${fnSign}</strong></h4>
+      <h4><strong>${fnSign.replaceAll("<", "&#60").replaceAll(">", "&#62")}</strong></h4>
       <h4>Lineas totales: ${totalLines}</h4>
       <h4>Lineas de código: ${codeLines}</h4>
       <h4>Lineas comentadas: ${comments}</h4>
@@ -211,9 +211,11 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
 
 function functionAnalizer(code) {
   posibleFnMatchArray = [...code.matchAll(JAVA_METHOD_SIGN_REGEX)]
+
   addResultsTitle()
 
-  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, fnName]) => {    
+  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, __, fnName]) => {    
+    console.log({ fnSign })
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
     const analisis = analizeCode(fnBody);
     const info = getInfo({fnSign, fnName, functionCode: fnBody, ...analisis})
@@ -227,7 +229,9 @@ function addResultsTitle() {
 }
 
 function loadFunctionListRegex(fnMatch) {
-  const fnName = fnMatch[3]
+  const fnName = fnMatch[4]
+
+  console.log({ fnName })
 
   functionsListRegex.push(new RegExp(fnName+PARTIAL_FUNCTION_CALL_REGEX.source, "gm"))
 
