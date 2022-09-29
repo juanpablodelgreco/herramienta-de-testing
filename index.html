@@ -17,27 +17,29 @@
     <div class="code_container">
       <h3 class="m-3">PEGUE EL MÉTODO A ANALIZAR</h3>
       <textarea class="m-3" id="input-code" rows="10" cols="100"></textarea>
-      <div class="row m-3 button_container">
-        <button class="btn btn-success m-2" type="button" onclick="showMetrics()">Analizar</button>
-        <button class="btn btn-secondary m-2" type="button" onclick="clearCode()">Limpiar</button>
-      </div>
     </div>
-  </div>
-  <div class="container bg-secondary border-gradient">
-    <div id="result_container" class="row px-5 py-3">      
-      <h1>Resultados</h1>
-      <div class="result">        
-        <h4><strong>Firma de la funcion</strong></h4>
-        <h4>Lineas totales: -</h4>
-        <h4>Lineas de código: -</h4>
-        <h4>Lineas comentadas: -</h4>
-        <h4>Lineas en blanco:-</h4>
-        <h4>Porcentaje lineas comentadas: -</h4>
-        <h4>Complejidad ciclomática: -</h4>
-        <h4>Fan in: -</h4>
-        <h4>Fan out: -</h4>
-        <h4>Halstead - Longitud: -</h4>
-        <h4>Halstead - Volumen: -</h4>
+    <div class="row m-3 button_container">
+      <button class="btn btn-success m-2" type="button" onclick="showMetrics()">Analizar</button>
+      <button class="btn btn-secondary m-2" type="button" onclick="clearCode()">Limpiar</button>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div id="result_container" class="row px-5 py-3">      
+          <h1>Resultados</h1>
+          <div class="result">        
+            <h4><strong>Firma de la funcion</strong></h4>
+            <h4>Lineas totales: -</h4>
+            <h4>Lineas de código: -</h4>
+            <h4>Lineas comentadas: -</h4>
+            <h4>Lineas en blanco:-</h4>
+            <h4>Porcentaje lineas comentadas: -</h4>
+            <h4>Complejidad ciclomática: -</h4>
+            <h4>Fan in: -</h4>
+            <h4>Fan out: -</h4>
+            <h4>Halstead - Longitud: -</h4>
+            <h4>Halstead - Volumen: -</h4>
+          </div>
+        </div>
       </div>
     </div>
   </div>
