@@ -6,7 +6,8 @@ let inputCode
 let functionsListRegex
 
 function clearCode() {
-  document.getElementById("input-code").value = ""
+  document.getElementById("input-code").value = "";
+  setInfoHTML("");
 }
 
 function showMetrics() {
@@ -117,14 +118,13 @@ function calculateComplexity(functionCode) {
 }
 
 function getOperators(functionCode) {
-  const operators = ["public", "static", "void", "&&", "||", "<=", ">=", "<", ">", "!=", "!", "+", "-", "/", "*", "int", "double", "float", ";", ":"];
-  const text = functionCode.split(' ');
+  const operators =  ["+", "-", "/", "*", "int", "double", "float", ";", ":", "public", "static", "void", "&&", "||", "<=", ">=", "<", ">"];
+  const textWithoutComments = functionCode.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
   let cantUniqueOperators = 0;
   let cantTotalOperators = 0;
-  for (let i = 0; i < text.length; i++) {
-    if (text[i].split('//').length > 1) { comments++; continue; }
-
-    if (text.indexOf(operators[i]) != -1)
+  for (let i = 0; i < operators.length; i++) {
+    
+    if (textWithoutComments.indexOf(operators[i]) != -1)
       cantUniqueOperators++;
 
     cantTotalOperators += functionCode.split(operators[i]).length - 1;
@@ -134,25 +134,24 @@ function getOperators(functionCode) {
 }
 
 function getOperands(functionCode) {
-  const operators = ["public", "static", "void", "&&", "||", "<=", ">=", "<", ">", "!=", "!", "+", "-", "/", "*", "int", "double", "float", ";", ":"];
-  const text = functionCode.split(' ');
+  const operators = ["+", "-", "/", "*", "int", "double", "float", ";", ":", "public", "static", "void", "&&", "||", "<=", ">=", "<", ">"];
   const uniqueOperands = [];
+  const textWithoutComments = (functionCode.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '')).split(' ');
   let cantUniqueOperands = 0;
   let cantTotalOperands = 0;
-  for (let i = 0; i < text.length; i++) {
+  for (let i = 0; i < textWithoutComments.length; i++) {
 
-    if (operators.indexOf(text[i]) == -1 && uniqueOperands.indexOf(text[i]) == -1) {
-      uniqueOperands.push(text[i]);
+    if (operators.indexOf(textWithoutComments[i]) == -1 && uniqueOperands.indexOf(textWithoutComments[i]) == -1) {
+      uniqueOperands.push(textWithoutComments[i]);
       cantUniqueOperands++;
     }
 
-    if (operators.indexOf(text[i]) == -1)
+    if (operators.indexOf(textWithoutComments[i]) == -1)
       cantTotalOperands++;
   }
 
   return { cantUniqueOperands, cantTotalOperands };
 }
-
 function getHalsteadLength(cantUniqueOperators, cantUniqueOperands) {
   return parseInt(cantUniqueOperators * Math.log2(cantUniqueOperators) + cantUniqueOperands * Math.log2(cantUniqueOperands));
 }
@@ -215,7 +214,6 @@ function functionAnalizer(code) {
   addResultsTitle()
 
   posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, __, fnName]) => {    
-    console.log({ fnSign })
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
     const analisis = analizeCode(fnBody);
     const info = getInfo({fnSign, fnName, functionCode: fnBody, ...analisis})
@@ -230,8 +228,6 @@ function addResultsTitle() {
 
 function loadFunctionListRegex(fnMatch) {
   const fnName = fnMatch[4]
-
-  console.log({ fnName })
 
   functionsListRegex.push(new RegExp(fnName+PARTIAL_FUNCTION_CALL_REGEX.source, "gm"))
 
