@@ -24,7 +24,7 @@ function functionAnalizer(code) {
 
   addResultsTitle()
 
-  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, __, fnName]) => {    
+  posibleFnMatchArray.filter(skipNoFunction).map(loadFunctionListRegex).forEach(([fnSignWithOpenToken, fnSign, _, __, fnName]) => {
     const fnBody = cropFunctionBody(code, fnSignWithOpenToken)
     const analisis = analizeCode(fnBody);
     const info = getInfo({fnSign, fnName, functionCode: fnBody, ...analisis})

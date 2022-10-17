@@ -58,7 +58,20 @@ h4 {
 }
 
 .result {
+  display: flex;
   padding: 20px 0;
   border-top: 1px solid black;
   scroll-snap-align: center;
 }
+
+.result.closed {
+  justify-content: space-between;
+}
+
+.result.opened {
+  flex-direction: column;
+}
+
+.result.closed .report { display: none; }
+.result.opened .report { display: block; }
+.result.opened button { display: none; }

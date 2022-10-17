@@ -12,16 +12,15 @@ function cropFunctionBody(code, fnSignWithOpenToken) {
 }
 
 function getOperators(functionCode) {
-  const operators =  ["+", "-", "/", "*", "int", "double", "float", ";", ":", "public", "static", "void", "&&", "||", "<=", ">=", "<", ">"];
   const textWithoutComments = functionCode.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '');
   let cantUniqueOperators = 0;
   let cantTotalOperators = 0;
-  for (let i = 0; i < operators.length; i++) {
+  for (let i = 0; i < OPERATORS.length; i++) {
     
-    if (textWithoutComments.indexOf(operators[i]) != -1)
+    if (textWithoutComments.indexOf(OPERATORS[i]) != -1)
       cantUniqueOperators++;
 
-    cantTotalOperators += functionCode.split(operators[i]).length - 1;
+    cantTotalOperators += functionCode.split(OPERATORS[i]).length - 1;
   }
 
   return { cantUniqueOperators, cantTotalOperators };
@@ -31,7 +30,7 @@ function analizeCode(functionCode) {
   let complex = 0;
   let blanks = 0;
   let comments = 0;
-  const text = functionCode.split('\n');
+  const text = functionCode.toLowerCase().split('\n');
   for (let i = 0; i < text.length; i++) {
     let hasIf = text[i].split('if(').length - 1 > 0 ? true : false;
     let hasIf2 = text[i].split('if (').length - 1 > 0 ? true : false;
@@ -64,19 +63,18 @@ function analizeCode(functionCode) {
 }
 
 function getOperands(functionCode) {
-  const operators = ["+", "-", "/", "*", "int", "double", "float", ";", ":", "public", "static", "void", "&&", "||", "<=", ">=", "<", ">"];
   const uniqueOperands = [];
   const textWithoutComments = (functionCode.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, '')).split(' ');
   let cantUniqueOperands = 0;
   let cantTotalOperands = 0;
   for (let i = 0; i < textWithoutComments.length; i++) {
 
-    if (operators.indexOf(textWithoutComments[i]) == -1 && uniqueOperands.indexOf(textWithoutComments[i]) == -1) {
+    if (OPERATORS.indexOf(textWithoutComments[i]) == -1 && uniqueOperands.indexOf(textWithoutComments[i]) == -1) {
       uniqueOperands.push(textWithoutComments[i]);
       cantUniqueOperands++;
     }
 
-    if (operators.indexOf(textWithoutComments[i]) == -1)
+    if (OPERATORS.indexOf(textWithoutComments[i]) == -1)
       cantTotalOperands++;
   }
 
