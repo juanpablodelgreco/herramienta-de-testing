@@ -2,6 +2,9 @@ const JAVA_METHOD_SIGN_REGEX = /^((public|private|protected|static|final|native|
 const PREDICATOR_REGEX = /((while|if)\s*\(.*\)|case *\w:)/gm
 const PARTIAL_FUNCTION_CALL_REGEX = /\s*\(/gm
 
+const INPUT_CODE_ID = "input-code"
+const RESULT_CONTAINER_ID = "result_container"
+
 const EXAMPLE_CODE = 
 `import java.io.*;
 import java.util.*;

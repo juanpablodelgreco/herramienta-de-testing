@@ -1,18 +1,18 @@
 function setInfoHTML(infoHTML) {
-  document.getElementById("result_container").innerHTML = infoHTML
+  document.getElementById(RESULT_CONTAINER_ID).innerHTML = infoHTML
 }
 
 function appendInfoHTML(infoHTML) {
-  document.getElementById("result_container").innerHTML += infoHTML
+  document.getElementById(RESULT_CONTAINER_ID).innerHTML += infoHTML
 }
 
 function clearCode() {
-  document.getElementById("input-code").value = "";
+  document.getElementById(INPUT_CODE_ID).value = "";
   setInfoHTML("");
 }
 
 function getInputCode() {
-  return document.getElementById("input-code").value.toLowerCase();
+  return document.getElementById(INPUT_CODE_ID).value.toLowerCase();
 }
 
 function addResultsTitle() {
