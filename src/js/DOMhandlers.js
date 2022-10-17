@@ -23,7 +23,7 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
   const formatedFnSing = fnSign.trim().replaceAll("<", "&#60").replaceAll(">", "&#62")
   let html =
     `
-    <div id="${formatedFnSing}" class="result closed">
+    <div id="${formatedFnSing}" class="result neomorphism closed">
       <h4><strong>${formatedFnSing}</strong></h4>
       <div class="report">
         <h4>Lineas totales: ${totalLines}</h4>

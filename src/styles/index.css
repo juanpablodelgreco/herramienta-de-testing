@@ -1,7 +1,6 @@
 body {
   min-height: 100vh;
-  background: rgb(2, 0, 36);
-  background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(140, 215, 165, 1) 35%, rgba(0, 212, 255, 1) 100%);
+  background: #fafafa;
 
   display: flex;
   align-items: center;
@@ -11,6 +10,10 @@ body {
   padding: 10px;
   margin-top: 30px;
   margin-bottom: 30px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
 .code_container {
@@ -59,9 +62,16 @@ h4 {
 
 .result {
   display: flex;
-  padding: 20px 0;
-  border-top: 1px solid black;
-  scroll-snap-align: center;
+  padding: 20px;
+  margin: 20px 0;
+  scroll-snap-align: center;  
+}
+
+.neomorphism {
+  border-radius: 10px;
+  background: #ebebeb;
+  box-shadow:  20px 20px 60px #c8c8c8,
+              -20px -20px 60px #ffffff;
 }
 
 .result.closed {
