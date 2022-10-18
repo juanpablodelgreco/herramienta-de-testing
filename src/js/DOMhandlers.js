@@ -19,23 +19,24 @@ function addResultsTitle() {
   setInfoHTML("<h2>Funciones detectadas...</h2>")
 }
 
-function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, blanks, comments, percentOfComments, halsteadLength, halsteadVolume}) {
+function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, blanks, comments, percentOfComments, halsteadLength, halsteadVolume, index}) {
   const formatedFnSing = fnSign.trim().replaceAll("<", "&#60").replaceAll(">", "&#62")
   let html =
     `
-    <div id="${formatedFnSing}" class="result neomorphism closed">
-      <h4><strong>${formatedFnSing}</strong></h4>
-      <div class="report">
-        <h4>Lineas totales: ${totalLines}</h4>
-        <h4>Lineas de código: ${codeLines}</h4>
-        <h4>Lineas comentadas: ${comments}</h4>
-        <h4>Lineas en blanco: ${blanks}</h4>
-        <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
-        <h4>Complejidad ciclomática: ${complex}</h4>
-        <h4>Fan in: ${fanIn}</h4>
-        <h4>Fan out: ${fanOut}</h4>
-        <h4>Halstead - Longitud: ${halsteadLength}</h4>
-        <h4>Halstead - Volumen: ${halsteadVolume}</h4>      
+    <div class="slide" style="--i:${index}">
+      <div id="${formatedFnSing}" class="result neomorphism closed">
+        <h4><strong>${formatedFnSing}</strong></h4>
+        <div class="report">
+          <h4>Lineas totales: ${totalLines}</h4>
+          <h4>Lineas de código: ${codeLines}</h4>
+          <h4>Lineas comentadas: ${comments}</h4>
+          <h4>Lineas en blanco: ${blanks}</h4>
+          <h4>Porcentaje lineas comentadas: ${percentOfComments}</h4>
+          <h4>Complejidad ciclomática: ${complex}</h4>
+          <h4>Fan in: ${fanIn}</h4>
+          <h4>Fan out: ${fanOut}</h4>
+          <h4>Halstead - Longitud: ${halsteadLength}</h4>
+          <h4>Halstead - Volumen: ${halsteadVolume}</h4>      
     `;
 
   if (parseInt(percentOfComments.split('%')[0]) < 10) {
@@ -55,8 +56,9 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
   }
 
   html += `
+        </div>
+        <button class="btn btn-success p-2" onclick="showReport('${formatedFnSing}')">Generar reporte</button>      
       </div>
-      <button class="btn btn-success p-2" onclick="showReport('${formatedFnSing}')">Generar reporte</button>      
     </div>
   `
 

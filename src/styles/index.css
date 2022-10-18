@@ -71,6 +71,33 @@ h4 {
   padding: 20px;
   margin: 20px 0;
   scroll-snap-align: center;  
+  transition: .25s;
+}
+
+.result:hover {
+  transform: scale(1.05);
+}
+
+.slide {
+  transform: translateX(-50px);
+  opacity: 0;
+
+  animation-name: slideAnimation;
+  animation-duration: 0.5s;
+  animation-delay: calc(0.25s * var(--i));
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideAnimation {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .neomorphism {
