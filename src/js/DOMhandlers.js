@@ -39,11 +39,19 @@ function generateHtml({fnSign, totalLines, codeLines, complex, fanIn, fanOut, bl
     `;
 
   if (parseInt(percentOfComments.split('%')[0]) < 10) {
-    html += `<h4 class="text-warning">El porcentaje de comentarios debería ser mayor a 10%.</h4>`;
+    html += `<h4 class="text-danger">El porcentaje de comentarios debería ser mayor a 10%.</h4>`;
+  }
+
+  if (parseInt(fanIn) > 5) {
+    html += `<h4 class="text-warning">Este método es crítico debido a que es llamado por mas de 5 métodos. Por lo tanto debería ser testeado en profundidad.</h4>`;
+  }
+
+  if (parseInt(fanOut) > 4) {
+    html += `<h4 class="text-warning">Es recomendable que el fanOut no sea superior a 4.</h4>`;
   }
 
   if (complex > 10) {
-    html += `<h4 class="text-warning">La complejidad ciclomática no debería ser mayor a 10.</h4>`;
+    html += `<h4 class="text-danger">La complejidad ciclomática no debería ser mayor a 10.</h4>`;
   }
 
   html += `

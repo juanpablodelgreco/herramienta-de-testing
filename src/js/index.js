@@ -78,5 +78,3 @@ function getInfo({ fnSign, fnName, functionCode, complex, blanks, comments, tota
     fanOut
   }
 }
-
-document.getElementById("input-code").value = EXAMPLE_CODE
